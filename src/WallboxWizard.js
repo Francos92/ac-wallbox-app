@@ -421,25 +421,25 @@ function MessungRow({ row, index, update }) {
     <div className="messung-row">
       <div className="messung-row-title">Stromkreis {index + 1}</div>
       <div className="field-grid">
-        <label className="field"><span>BMK.</span><input value={row.bmk} onChange={(e) => set('bmk', e.target.value)} /></label>
+        <label className="field"><span>BMK.</span><input value={row.bmk} onChange={(e) => set('bmk', e.target.value)} placeholder="z.B. F1" /></label>
         <label className="field"><span>Stromkreis</span><input value={row.stromkreis} onChange={(e) => set('stromkreis', e.target.value)} placeholder="z.B. Links" /></label>
-        <label className="field"><span>Kabel-Typ</span><input value={row.kabelTyp} onChange={(e) => set('kabelTyp', e.target.value)} /></label>
-        <label className="field"><span>Aderzahl</span><input value={row.ader} onChange={(e) => set('ader', e.target.value)} /></label>
-        <label className="field"><span>Querschnitt [mm²]</span><input value={row.querschnitt} onChange={(e) => set('querschnitt', e.target.value)} /></label>
-        <label className="field"><span>Isowiderstand v.Schütz [MΩ]</span><input value={row.isoVSchuetz} onChange={(e) => set('isoVSchuetz', e.target.value)} /></label>
-        <label className="field"><span>Isowiderstand n.Schütz [MΩ]</span><input value={row.isoNSchuetz} onChange={(e) => set('isoNSchuetz', e.target.value)} /></label>
-        <label className="field"><span>Art (B/C/D)</span><input value={row.art} onChange={(e) => set('art', e.target.value)} /></label>
-        <label className="field"><span>IN [A]</span><input value={row.inA} onChange={(e) => set('inA', e.target.value)} /></label>
-        <label className="field"><span>Zs [Ω]</span><input value={row.zs} onChange={(e) => set('zs', e.target.value)} /></label>
-        <label className="field"><span>Ik (bei Zs) [A]</span><input value={row.zsIk} onChange={(e) => set('zsIk', e.target.value)} /></label>
-        <label className="field"><span>Zi [Ω]</span><input value={row.zi} onChange={(e) => set('zi', e.target.value)} /></label>
-        <label className="field"><span>Ik (bei Zi) [A]</span><input value={row.ziIk} onChange={(e) => set('ziIk', e.target.value)} /></label>
-        <label className="field"><span>RCD Typ</span><input value={row.rcdTyp} onChange={(e) => set('rcdTyp', e.target.value)} placeholder="A / B" /></label>
-        <label className="field"><span>RCD In [A]</span><input value={row.rcdIn} onChange={(e) => set('rcdIn', e.target.value)} /></label>
-        <label className="field"><span>I∆N [mA]</span><input value={row.iDeltaN} onChange={(e) => set('iDeltaN', e.target.value)} /></label>
-        <label className="field"><span>IA [mA]</span><input value={row.iA} onChange={(e) => set('iA', e.target.value)} /></label>
-        <label className="field"><span>tA [ms]</span><input value={row.tA} onChange={(e) => set('tA', e.target.value)} /></label>
-        <label className="field"><span>UB [V]</span><input value={row.uB} onChange={(e) => set('uB', e.target.value)} /></label>
+        <label className="field"><span>Kabel-Typ</span><input value={row.kabelTyp} onChange={(e) => set('kabelTyp', e.target.value)} placeholder="z.B. NYY-J" /></label>
+        <label className="field"><span>Aderzahl</span><input value={row.ader} onChange={(e) => set('ader', e.target.value)} placeholder="z.B. 5" /></label>
+        <label className="field"><span>Querschnitt [mm²]</span><input value={row.querschnitt} onChange={(e) => set('querschnitt', e.target.value)} placeholder="z.B. 5x2,5" /></label>
+        <label className="field"><span>Isowiderstand v.Schütz [MΩ]</span><input value={row.isoVSchuetz} onChange={(e) => set('isoVSchuetz', e.target.value)} placeholder="z.B. >999" /></label>
+        <label className="field"><span>Isowiderstand n.Schütz [MΩ]</span><input value={row.isoNSchuetz} onChange={(e) => set('isoNSchuetz', e.target.value)} placeholder="z.B. >999" /></label>
+        <label className="field"><span>Art (B/C/D)</span><input value={row.art} onChange={(e) => set('art', e.target.value)} placeholder="z.B. C" /></label>
+        <label className="field"><span>IN [A]</span><input value={row.inA} onChange={(e) => set('inA', e.target.value)} placeholder="z.B. 32" /></label>
+        <label className="field"><span>Zs [Ω]</span><input value={row.zs} onChange={(e) => set('zs', e.target.value)} placeholder="z.B. 0,35" /></label>
+        <label className="field"><span>Ik (bei Zs) [A]</span><input value={row.zsIk} onChange={(e) => set('zsIk', e.target.value)} placeholder="z.B. 657" /></label>
+        <label className="field"><span>Zi [Ω]</span><input value={row.zi} onChange={(e) => set('zi', e.target.value)} placeholder="z.B. 0,42" /></label>
+        <label className="field"><span>Ik (bei Zi) [A]</span><input value={row.ziIk} onChange={(e) => set('ziIk', e.target.value)} placeholder="z.B. 550" /></label>
+        <label className="field"><span>RCD Typ</span><input value={row.rcdTyp} onChange={(e) => set('rcdTyp', e.target.value)} placeholder="z.B. A" /></label>
+        <label className="field"><span>RCD In [A]</span><input value={row.rcdIn} onChange={(e) => set('rcdIn', e.target.value)} placeholder="z.B. 63" /></label>
+        <label className="field"><span>I∆N [mA]</span><input value={row.iDeltaN} onChange={(e) => set('iDeltaN', e.target.value)} placeholder="z.B. 30" /></label>
+        <label className="field"><span>IA [mA]</span><input value={row.iA} onChange={(e) => set('iA', e.target.value)} placeholder="z.B. 21" /></label>
+        <label className="field"><span>tA [ms]</span><input value={row.tA} onChange={(e) => set('tA', e.target.value)} placeholder="z.B. 25" /></label>
+        <label className="field"><span>UB [V]</span><input value={row.uB} onChange={(e) => set('uB', e.target.value)} placeholder="z.B. 24" /></label>
       </div>
     </div>
   );
@@ -471,10 +471,9 @@ function StepMessung({ state, update, setState }) {
     </div>
   );
 }
-StepMessung.isValid = (s) => {
-  const first = s.messung[0];
-  return !!first && !!first.stromkreis && !!first.art && !!first.inA && !!first.rcdIn && !!first.rcdTyp;
-};
+// Messung ist absichtlich nie blockierend: nicht jede Position ist bei jeder
+// Prüfung relevant, daher darf man auch mit leeren Feldern weiter.
+StepMessung.isValid = () => true;
 
 // ---------------------------------------------------------------------
 // Step: Ergebnis & Fotos
