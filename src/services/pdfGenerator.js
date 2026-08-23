@@ -1,4 +1,4 @@
-import { PDFDocument, PDFTextField, PDFCheckBox, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, PDFTextField, PDFCheckBox, rgb } from 'pdf-lib';
 import {
   TEXT_FIELDS,
   BESICHTIGEN_ITEMS,
@@ -87,26 +87,6 @@ function fillTriState(form, items, stateGroup) {
 // da es kein Formularfeld ist und nicht über die Form-API geleert werden kann).
 function coverWithWhite(page, target) {
   page.drawRectangle({ x: target.x, y: target.y, width: target.width, height: target.height, color: rgb(1, 1, 1) });
-}
-
-// Großes, gut sichtbares J/H-Kennzeichen oben links auf Seite 1 (freier
-// Bereich zwischen Seitenrand und Titel/Logo) — zeigt auf einen Blick, ob
-// es sich um eine jährliche oder halbjährliche Prüfung handelt.
-async function drawPruefintervallBadge(pdfDoc, page, pruefintervall) {
-  const letter = pruefintervall === 'H' ? 'H' : 'J';
-  const color = letter === 'H' ? rgb(0.118, 0.541, 0.294) : rgb(0.086, 0.133, 0.247);
-  const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const box = { x: 20, y: 793, width: 40, height: 38 };
-  page.drawRectangle({ ...box, color });
-  const fontSize = 26;
-  const textWidth = font.widthOfTextAtSize(letter, fontSize);
-  page.drawText(letter, {
-    x: box.x + (box.width - textWidth) / 2,
-    y: box.y + (box.height - fontSize) / 2 + 4,
-    size: fontSize,
-    font,
-    color: rgb(1, 1, 1),
-  });
 }
 
 async function drawImageContain(pdfDoc, page, dataUrl, target) {
@@ -223,7 +203,6 @@ export async function generateWallboxPDF(state) {
   const page2 = pages[IMAGE_TARGETS.fotoPruefplakette.page];
   await drawImageContain(pdfDoc, page2, state.fotos?.pruefplakette, IMAGE_TARGETS.fotoPruefplakette);
   await drawImageContain(pdfDoc, page2, state.fotos?.wallboxStatus, IMAGE_TARGETS.fotoWallboxStatus);
-  await drawPruefintervallBadge(pdfDoc, pages[0], state.pruefintervall);
 
   const pdfBytes = await pdfDoc.save();
   return new Blob([pdfBytes], { type: 'application/pdf' });
