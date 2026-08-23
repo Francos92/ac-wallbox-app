@@ -505,6 +505,7 @@ input { font-family: inherit; }
   gap: 2px;
   margin-bottom: 8px;
 }
+.password-gate-logo { width: 100%; max-width: 220px; height: auto; }
 .password-gate-box input {
   text-align: center;
   font-size: 1.3rem;

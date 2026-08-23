@@ -3,7 +3,7 @@
 // (JS/CSS-Bundles, PDF-Vorlage, Icons) wird beim ersten Laden automatisch
 // zwischengespeichert und danach auch ohne Internetverbindung geladen.
 
-const CACHE_NAME = 'braba-prueftool-1787504038107';
+const CACHE_NAME = 'braba-prueftool-1787504881263';
 const APP_SHELL = [
   '/',
   '/index.html',

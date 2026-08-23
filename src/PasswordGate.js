@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import brabaLogo from './Braba logo.svg';
 
 const PASSWORD = '0743';
 const STORAGE_KEY = 'braba-unlock-date';
@@ -45,8 +46,7 @@ export default function PasswordGate({ children }) {
     <div className="password-gate">
       <form className="password-gate-box" onSubmit={handleSubmit}>
         <div className="password-gate-brand">
-          <span className="home-brand-name">BraBa</span>
-          <span className="home-brand-sub">ELEKTROTECHNIK</span>
+          <img src={brabaLogo} alt="BraBa Elektrotechnik" className="password-gate-logo" />
         </div>
         <label className="field">
           <span>Zugangscode</span>
