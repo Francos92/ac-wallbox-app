@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import TriState from './components/TriState';
-import SignaturePad from './components/SignaturePad';
 import PhotoCapture from './components/PhotoCapture';
 import { BESICHTIGEN_ITEMS, ERPROBEN_ITEMS } from './services/wallboxFieldMap';
 import { generateWallboxPDF, pdfFileName, downloadBlob } from './services/pdfGenerator';
@@ -70,9 +69,14 @@ function createInitialState(profile) {
     fotos: { pruefplakette: null, wallboxStatus: null },
     bemerkung: '',
     abschluss: {
+      // Auftraggeber-Angaben (Übergabebericht, Datum, Unterschrift) werden
+      // nicht mehr in der App erfasst — der Auftraggeber erhält das fertige
+      // PDF und trägt diese Punkte selbst von Hand in die dafür vorgesehenen
+      // Felder ein. Ebenso werden Unterschriften nicht digital erfasst;
+      // im PDF bleiben die Unterschriftsfelder leer für die Unterschrift von Hand.
       auftraggeberUebergabe: false,
       auftraggeberMaengelbericht: false,
-      pruferEntspricht: null,
+      pruferEntspricht: true,
       ort: profile?.ort || 'Wiesbaden',
       datumAuftraggeber: '',
       datumPruefer: today,
@@ -541,21 +545,12 @@ StepErgebnis.isValid = (s) =>
 // ---------------------------------------------------------------------
 // Step: Abschluss & Unterschriften
 // ---------------------------------------------------------------------
+// Auftraggeber-Bestätigung und Unterschriften werden von Hand auf dem
+// ausgedruckten PDF ergänzt (Standardfelder des Formulars) — die App
+// erfasst hier nur noch das Prüfergebnis und das Prüfungsdatum.
 function StepAbschluss({ state, update }) {
   return (
     <div className="step">
-      <h2>Auftraggeber</h2>
-      <label className="checkbox-line">
-        <input type="checkbox" checked={!!state.abschluss.auftraggeberUebergabe}
-          onChange={(e) => update('abschluss.auftraggeberUebergabe', e.target.checked)} />
-        Gemäß Übergabebericht elektrische Anlage funktionsfähig übernommen
-      </label>
-      <label className="checkbox-line">
-        <input type="checkbox" checked={!!state.abschluss.auftraggeberMaengelbericht}
-          onChange={(e) => update('abschluss.auftraggeberMaengelbericht', e.target.checked)} />
-        Mängelbericht erhalten (nur bei Wiederholungsprüfung)
-      </label>
-
       <h2>Prüfer</h2>
       <BigChoice
         options={[
@@ -568,29 +563,12 @@ function StepAbschluss({ state, update }) {
 
       <div className="field-grid">
         <Field label="Ort" path="abschluss.ort" state={state} update={update} />
-        <Field label="Datum (Auftraggeber)" path="abschluss.datumAuftraggeber" state={state} update={update} type="date" />
         <Field label="Datum (Prüfer)" path="abschluss.datumPruefer" state={state} update={update} type="date" />
-      </div>
-
-      <h2>Unterschriften</h2>
-      <div className="signature-grid">
-        <SignaturePad
-          label="Auftraggeber"
-          value={state.abschluss.unterschriftAuftraggeber}
-          onChange={(v) => update('abschluss.unterschriftAuftraggeber', v)}
-        />
-        <SignaturePad
-          label="Prüfer"
-          value={state.abschluss.unterschriftPruefer}
-          onChange={(v) => update('abschluss.unterschriftPruefer', v)}
-        />
       </div>
     </div>
   );
 }
-StepAbschluss.isValid = (s) =>
-  !!s.abschluss.ort && !!s.abschluss.datumPruefer && s.abschluss.pruferEntspricht !== null &&
-  !!s.abschluss.unterschriftAuftraggeber && !!s.abschluss.unterschriftPruefer;
+StepAbschluss.isValid = () => true;
 
 // ---------------------------------------------------------------------
 // Step: Zusammenfassung & Export
@@ -628,7 +606,7 @@ const STEPS = [
   { title: 'Erproben', Component: StepErproben, isValid: StepErproben.isValid },
   { title: 'Messung', Component: StepMessung, isValid: StepMessung.isValid },
   { title: 'Ergebnis & Fotos', Component: StepErgebnis, isValid: StepErgebnis.isValid },
-  { title: 'Abschluss & Unterschriften', Component: StepAbschluss, isValid: StepAbschluss.isValid },
+  { title: 'Abschluss', Component: StepAbschluss, isValid: StepAbschluss.isValid },
   { title: 'Fertigstellen', Component: null, isValid: () => true },
 ];
 
