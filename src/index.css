@@ -175,14 +175,14 @@ input { font-family: inherit; }
   font-size: 0.85rem;
   color: #4b5563;
 }
-.field input {
+.field input, .field select {
   padding: 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
   font-size: 1rem;
   background: white;
 }
-.field input:focus { outline: 2px solid var(--braba-red); border-color: transparent; }
+.field input:focus, .field select:focus { outline: 2px solid var(--braba-red); border-color: transparent; }
 
 .checkbox-line, .checkbox-list label {
   display: flex;

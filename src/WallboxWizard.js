@@ -99,6 +99,52 @@ function Field({ label, path, state, update, type = 'text', placeholder }) {
   );
 }
 
+// Ableitung der Kurzform ("A"/"B") aus der gewählten Fehlerstromerkennung,
+// für das RCD-Typ-Feld in der Messung-Tabelle.
+const rcdShortCode = (value) => {
+  if (value === 'Typ A') return 'A';
+  if (value === 'Typ B') return 'B';
+  return value || '';
+};
+
+function FehlerstromerkennungField({ state, setState }) {
+  const value = state.ladestation.fehlerstromerkennung;
+  const isPreset = value === '' || value === 'Typ A' || value === 'Typ B';
+  const selectValue = isPreset ? value : 'custom';
+
+  const applyValue = (newValue) => {
+    setState((s) => {
+      const shortCode = rcdShortCode(newValue);
+      const messung = s.messung.map((row) => (row.rcdTyp ? row : { ...row, rcdTyp: shortCode }));
+      return { ...s, ladestation: { ...s.ladestation, fehlerstromerkennung: newValue }, messung };
+    });
+  };
+
+  return (
+    <label className="field">
+      <span>Fehlerstromerkennung</span>
+      <select
+        value={selectValue}
+        onChange={(e) => applyValue(e.target.value === 'custom' ? '' : e.target.value)}
+      >
+        <option value="">– wählen –</option>
+        <option value="Typ A">Typ A</option>
+        <option value="Typ B">Typ B</option>
+        <option value="custom">Andere…</option>
+      </select>
+      {selectValue === 'custom' && (
+        <input
+          type="text"
+          placeholder="z.B. Typ F, Typ B+"
+          value={value}
+          onChange={(e) => applyValue(e.target.value)}
+          style={{ marginTop: 8 }}
+        />
+      )}
+    </label>
+  );
+}
+
 function BigChoice({ label, options, value, onChange }) {
   return (
     <div className="bigchoice">
@@ -122,7 +168,23 @@ function BigChoice({ label, options, value, onChange }) {
 // ---------------------------------------------------------------------
 // Step: Auftraggeber & Ladestation
 // ---------------------------------------------------------------------
-function StepAuftraggeber({ state, update }) {
+function StepAuftraggeber({ state, update, setState }) {
+  const handleAnzLadepunkteChange = (raw) => {
+    setState((s) => {
+      const target = Math.min(5, Math.max(0, parseInt(raw, 10) || 0));
+      let messung = s.messung;
+      if (target > messung.length) {
+        const shortCode = rcdShortCode(s.ladestation.fehlerstromerkennung);
+        const toAdd = target - messung.length;
+        messung = [
+          ...messung,
+          ...Array.from({ length: toAdd }, () => ({ ...emptyMessungRow(), rcdTyp: shortCode })),
+        ];
+      }
+      return { ...s, ladestation: { ...s.ladestation, anzLadepunkte: raw }, messung };
+    });
+  };
+
   return (
     <div className="step">
       <h2>Auftraggeber</h2>
@@ -139,8 +201,17 @@ function StepAuftraggeber({ state, update }) {
         <Field label="Hersteller" path="ladestation.hersteller" state={state} update={update} />
         <Field label="Modell" path="ladestation.modell" state={state} update={update} />
         <Field label="Serien-Nr." path="ladestation.seriennr" state={state} update={update} />
-        <Field label="Fehlerstromerkennung" path="ladestation.fehlerstromerkennung" state={state} update={update} placeholder="z.B. B-RCD" />
-        <Field label="Anz. Ladepunkte" path="ladestation.anzLadepunkte" state={state} update={update} type="number" />
+        <FehlerstromerkennungField state={state} setState={setState} />
+        <label className="field">
+          <span>Anz. Ladepunkte</span>
+          <input
+            type="number"
+            min="1"
+            max="5"
+            value={state.ladestation.anzLadepunkte}
+            onChange={(e) => handleAnzLadepunkteChange(e.target.value)}
+          />
+        </label>
         <Field label="Anschlussart" path="ladestation.anschlussart" state={state} update={update} />
       </div>
     </div>
