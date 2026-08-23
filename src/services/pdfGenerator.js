@@ -24,15 +24,34 @@ async function loadTemplateBytes() {
   return templateBytesCache;
 }
 
-function setTextSafe(form, name, value) {
+function setTextSafe(form, name, value, fontSize) {
   if (!name) return;
   try {
     const field = form.getField(name);
-    if (field instanceof PDFTextField) field.setText(value == null ? '' : String(value));
+    if (field instanceof PDFTextField) {
+      // fontSize=0 lässt pdf-lib die Schrift automatisch verkleinern, damit der
+      // Text auch in schmale Felder passt (z.B. "Nächster Prüftermin").
+      if (fontSize !== undefined) field.setFontSize(fontSize);
+      field.setText(value == null ? '' : String(value));
+    }
   } catch (e) {
     console.warn('Textfeld nicht gefunden:', name);
   }
 }
+
+// Wandelt ein <input type="date">-Ergebnis (JJJJ-MM-TT) in das deutsche
+// Format TT.MM.JJJJ um.
+function formatDeDate(isoDate) {
+  if (!isoDate) return '';
+  const [y, m, d] = String(isoDate).split('-');
+  return d && m && y && y.length === 4 ? `${d}.${m}.${y}` : isoDate;
+}
+
+const DATE_PATHS = new Set(['naechsterPrueftermin', 'abschluss.datumAuftraggeber', 'abschluss.datumPruefer']);
+// "Nächster Prüftermin" ist im Template nur 43pt breit mit fester 9pt-Schrift
+// — dort muss die Schrift automatisch schrumpfen, sonst läuft das Datum über
+// den Rand hinaus.
+const AUTO_SIZE_FIELDS = new Set(['Nächster Prüftermin']);
 
 function setCheckSafe(form, name, checked) {
   if (!name) return;
@@ -123,7 +142,10 @@ export async function generateWallboxPDF(state) {
 
   // -- campi testo diretti (dot-path) --
   Object.entries(TEXT_FIELDS).forEach(([path, fieldName]) => {
-    setTextSafe(form, fieldName, getPath(state, path));
+    const raw = getPath(state, path);
+    const value = DATE_PATHS.has(path) ? formatDeDate(raw) : raw;
+    const fontSize = AUTO_SIZE_FIELDS.has(fieldName) ? 0 : undefined;
+    setTextSafe(form, fieldName, value, fontSize);
   });
 
   // -- Grund der Prüfung (selezione singola tra 4) --
