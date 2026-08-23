@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import TriState from './components/TriState';
 import SignaturePad from './components/SignaturePad';
 import PhotoCapture from './components/PhotoCapture';
@@ -658,12 +658,12 @@ export default function WallboxWizard({ onExit }) {
   }, []);
 
   const currentStep = STEPS[stepIndex];
-  const currentValid = useMemo(() => (state && currentStep.isValid ? currentStep.isValid(state) : true), [state, currentStep]);
 
   if (!state) return <div className="loading">Lädt…</div>;
 
+  // Kein Schritt blockiert "Weiter" mehr — in der Praxis ist nicht bei
+  // jeder Prüfung jedes Feld auf jeder Seite relevant.
   const goNext = () => {
-    if (!currentValid) return;
     setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
     window.scrollTo(0, 0);
   };
@@ -731,7 +731,7 @@ export default function WallboxWizard({ onExit }) {
       {currentStep.Component && (
         <footer className="wizard-footer">
           <button type="button" className="btn-secondary" onClick={goBack} disabled={stepIndex === 0}>Zurück</button>
-          <button type="button" className="btn-primary" onClick={goNext} disabled={!currentValid}>
+          <button type="button" className="btn-primary" onClick={goNext}>
             Weiter
           </button>
         </footer>

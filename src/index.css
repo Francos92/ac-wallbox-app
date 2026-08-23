@@ -184,6 +184,13 @@ input { font-family: inherit; }
 }
 .field input:focus, .field select:focus { outline: 2px solid var(--braba-red); border-color: transparent; }
 
+/* Messung: ausgefülltes Feld wird sofort grün — schneller visueller Überblick */
+.messung-row .field input:not(:placeholder-shown) {
+  background: #e9f7ef;
+  border-color: var(--ok-green);
+  color: #14532d;
+}
+
 .checkbox-line, .checkbox-list label {
   display: flex;
   align-items: center;
