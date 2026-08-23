@@ -386,4 +386,42 @@ input { font-family: inherit; }
 }
 .archive-item-title { font-weight: 700; }
 .archive-item-sub { color: #6b7280; font-size: 0.85rem; margin-top: 4px; }
+
+/* Wallbox-Liste */
+.wl-error { color: var(--nio-red); font-size: 0.9rem; margin-top: 8px; }
+.wl-meta { color: #6b7280; font-size: 0.85rem; margin: 16px 0 8px; }
+.wl-search {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  background: white;
+  margin-bottom: 12px;
+}
+.wl-list { display: flex; flex-direction: column; gap: 8px; }
+.wl-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: white;
+  text-align: left;
+  width: 100%;
+}
+.wl-row-main { display: flex; flex-direction: column; }
+.wl-row-title { font-weight: 700; }
+.wl-row-sub { color: #6b7280; font-size: 0.85rem; }
+.wl-row-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+.wl-row-badge { color: var(--ok-green); font-weight: 700; }
+.wl-row-done { border-color: var(--ok-green); background: #f2faf5; }
+.wl-row-selected { border-color: var(--braba-red); box-shadow: 0 0 0 2px rgba(200,30,44,0.15); }
 .archive-item-actions { display: flex; gap: 8px; }

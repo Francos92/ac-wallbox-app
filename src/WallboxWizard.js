@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import TriState from './components/TriState';
 import PhotoCapture from './components/PhotoCapture';
+import StepWallboxListe from './WallboxListeStep';
 import { BESICHTIGEN_ITEMS, ERPROBEN_ITEMS } from './services/wallboxFieldMap';
 import { generateWallboxPDF, pdfFileName, downloadBlob } from './services/pdfGenerator';
 import { saveDraft, deleteDraft, saveArchiveEntry, getActiveDraft, getProfile } from './services/database';
@@ -42,7 +43,7 @@ function createInitialState(profile) {
       anschrift: profile?.pruefer?.anschrift || 'Frankenstr. 5 - 65183 Wiesbaden',
       tel: profile?.pruefer?.tel || '0611 510 521 09',
     },
-    ladestation: { anschrift: '', hersteller: '', modell: '', seriennr: '', fehlerstromerkennung: '', anzLadepunkte: '1', anschlussart: 'Buchse, Typ2' },
+    ladestation: { anschrift: '', hersteller: '', modell: '', seriennr: '', fehlerstromerkennung: '', anzLadepunkte: '1', anschlussart: 'Buchse, Typ2', strasseOrtHint: '' },
     grund: { type: 'wiederholung', sonstigeText: '' },
     netzform: 'TNCS',
     pruefungNach: { dinvde0100600: false, dinvde0105100: false, dguv3: true },
@@ -599,6 +600,7 @@ function StepReview({ state, allSteps, jumpTo, onExport, exporting }) {
 // Wizard shell
 // ---------------------------------------------------------------------
 const STEPS = [
+  { title: 'Wallbox-Liste', Component: StepWallboxListe, isValid: () => true },
   { title: 'Auftraggeber & Ladestation', Component: StepAuftraggeber, isValid: StepAuftraggeber.isValid },
   { title: 'Prüfer & Messgeräte', Component: StepPruefer, isValid: StepPruefer.isValid },
   { title: 'Grund & Normen', Component: StepGrund, isValid: StepGrund.isValid },
@@ -681,6 +683,7 @@ export default function WallboxWizard({ onExit }) {
           auftraggeber: state.auftraggeber.name,
           datum: state.abschluss.datumPruefer,
           ergebnis: state.ergebnis,
+          seriennr: state.ladestation.seriennr,
         },
       });
       await deleteDraft(state.id);
@@ -709,7 +712,7 @@ export default function WallboxWizard({ onExit }) {
 
       <main className="wizard-body">
         {currentStep.Component ? (
-          <currentStep.Component state={state} update={update} setState={setState} />
+          <currentStep.Component state={state} update={update} setState={setState} goNext={goNext} />
         ) : (
           <StepReview
             state={state}

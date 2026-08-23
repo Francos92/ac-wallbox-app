@@ -4,7 +4,7 @@
 // riutilizzabili: Prüfer, Messgerät, Adapter).
 
 const DB_NAME = 'brabaPrueftoolDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -24,6 +24,9 @@ function openDB() {
       }
       if (!db.objectStoreNames.contains('equipment')) {
         db.createObjectStore('equipment', { keyPath: 'id', autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains('wallboxListe')) {
+        db.createObjectStore('wallboxListe', { keyPath: 'key' });
       }
     };
 
@@ -118,4 +121,21 @@ export async function saveEquipment(item) {
 export async function deleteEquipment(id) {
   const db = await openDB();
   await tx(db, 'equipment', 'readwrite', (store) => store.delete(id));
+}
+
+// ---- Wallbox-Liste (aus Excel importierte Prüfliste, monatlich ersetzt) ---
+
+const WALLBOX_LISTE_KEY = 'current';
+
+export async function saveWallboxListe(rows) {
+  const db = await openDB();
+  const record = { key: WALLBOX_LISTE_KEY, rows, loadedAt: new Date().toISOString() };
+  await tx(db, 'wallboxListe', 'readwrite', (store) => store.put(record));
+  return record;
+}
+
+export async function getWallboxListe() {
+  const db = await openDB();
+  const result = await tx(db, 'wallboxListe', 'readonly', (store) => store.get(WALLBOX_LISTE_KEY));
+  return result || null;
 }

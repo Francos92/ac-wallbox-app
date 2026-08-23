@@ -177,11 +177,27 @@ export async function generateWallboxPDF(state) {
   return new Blob([pdfBytes], { type: 'application/pdf' });
 }
 
+// Grobe Schätzung "Straße Ort" (ohne Hausnr./PLZ) aus dem freien
+// Anschrift-Text, für Prüfungen ohne Wallbox-Liste-Import. Bei Import aus
+// der Excel-Liste steht mit strasseOrtHint die verlässliche Variante zur
+// Verfügung (siehe wallboxListeImport.js).
+function fallbackStrasseOrt(anschrift) {
+  const isHouseNrOrPlz = /^\d+[a-zA-Z]?(-\d+[a-zA-Z]?)?,?$/;
+  const tokens = (anschrift || '').split(/\s+/).filter((t) => t && !isHouseNrOrPlz.test(t));
+  return tokens.join(' ').trim();
+}
+
+// Format wie im Referenzprotokoll: "Straße Ort_J_JJJJ-MM-TT_Seriennummer.pdf"
+// ("J" = jährliche/große Prüfung — der einzige Prüftyp, den die App aktuell
+// abbildet).
 export function pdfFileName(state) {
-  const ort = (state.ladestation?.anschrift || 'Wallbox').split(',')[0].trim().replace(/[^\w\- ]/g, '');
-  const date = (state.abschluss?.datumPruefer || new Date().toISOString().split('T')[0]).replace(/\//g, '-');
+  const strasseOrt =
+    (state.ladestation?.strasseOrtHint || fallbackStrasseOrt(state.ladestation?.anschrift) || 'Wallbox')
+      .replace(/[^\w\- äöüÄÖÜß]/g, '')
+      .trim() || 'Wallbox';
+  const date = state.abschluss?.datumPruefer || new Date().toISOString().split('T')[0];
   const sn = state.ladestation?.seriennr || '';
-  return `Pruefbericht_${ort}_${date}_${sn}.pdf`.replace(/\s+/g, '_');
+  return `${strasseOrt}_J_${date}_${sn}.pdf`;
 }
 
 export function downloadBlob(blob, filename) {
