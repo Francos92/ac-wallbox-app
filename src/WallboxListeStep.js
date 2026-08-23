@@ -130,6 +130,11 @@ export default function StepWallboxListe({ state, setState, goNext }) {
           {importing ? 'Wird geladen…' : liste ? 'Neue Liste laden' : 'Liste laden (Excel)'}
         </button>
         {liste && (
+          <button type="button" className="btn-secondary" onClick={() => loadDoneSerials(liste)}>
+            🔄 Erledigt-Status aktualisieren
+          </button>
+        )}
+        {liste && (
           <button type="button" className="btn-danger" onClick={() => setConfirmStep(1)}>
             Liste löschen
           </button>

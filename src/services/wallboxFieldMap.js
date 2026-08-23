@@ -145,17 +145,13 @@ export const MESSUNG_ROW_FIELDS = [
 // (handgezeichnete Bilder/Bildbuttons). Sie werden direkt auf die Seite an
 // den Koordinaten des ursprünglichen Widget-Rechtecks gezeichnet.
 //
-// unterschriftPruefer deckt NUR die im Template fest eingebrannte
-// Original-Unterschrift von Branko ab (kein Formularfeld, kann nicht über
-// die AcroForm-API geleert werden) — Koordinaten wurden per Pixelmessung
-// am gerenderten Template ermittelt (nicht mehr geschätzt). Auf der
-// Auftraggeber-Seite ist die Unterschriftszeile im Template bereits leer,
-// dort wird daher nichts mehr abgedeckt (das hatte zuvor fälschlich das
-// "Unterschrift:"-Label mit verdeckt).
+// Die im Template fest eingebrannte Unterschrift von Branko (Prüfer) wird
+// NICHT abgedeckt — sie bleibt als fester Stempel auf jedem PDF erhalten,
+// genau wie im Referenzprotokoll. Die Auftraggeber-Unterschriftszeile ist
+// im Template bereits leer (für die Unterschrift von Hand durch den Kunden).
 export const IMAGE_TARGETS = {
   fotoPruefplakette: { page: 1, x: 62.9, y: 339.2, width: 196.6, height: 148.5 },
   fotoWallboxStatus: { page: 1, x: 302.1, y: 163.4, width: 231.1, height: 324.3 },
-  unterschriftPruefer: { page: 1, x: 459, y: 60, width: 57, height: 68 },
 };
 
 export const TEMPLATE_URL = process.env.PUBLIC_URL + '/assets/wallbox-template.pdf';

@@ -63,29 +63,11 @@ function fillTriState(form, items, stateGroup) {
   });
 }
 
-// Deckt die Zielzone blickdicht weiß ab, bevor etwas Neues gezeichnet wird.
-// Notwendig, weil im Original-Template (Monzastraße-Beispiel) an diesen Stellen
-// noch das alte Beispielfoto bzw. die handschriftliche Unterschrift von Branko
-// direkt im Seiteninhalt eingebettet ist (keine Formularfelder, kann nicht
-// über das Form-API geleert werden).
+// Deckt die Zielzone blickdicht weiß ab, bevor etwas Neues gezeichnet wird
+// (für Fotos — dort MUSS das alte Beispielbild im Template überdeckt werden,
+// da es kein Formularfeld ist und nicht über die Form-API geleert werden kann).
 function coverWithWhite(page, target) {
   page.drawRectangle({ x: target.x, y: target.y, width: target.width, height: target.height, color: rgb(1, 1, 1) });
-}
-
-// Die weiße Abdeckung der Prüfer-Unterschrift überlappt die untere Tabellen-
-// linie der Zelle (im Original an dieser Stelle vom Signatur-Schnörkel
-// durchkreuzt). Statt nur das überdeckte Stück zu ergänzen (führte zu einem
-// leicht versetzten, sichtbaren Bruch in der Linie), wird die GESAMTE
-// untere Linie der Prüfer-Zelle neu gezeichnet — exakt an Position und
-// Stärke des Originals (per Vektor-Analyse des Templates ermittelt), damit
-// sie garantiert durchgehend und sauber wirkt.
-function restorePrueferBorderSegment(page) {
-  page.drawLine({
-    start: { x: 299, y: 80.88 },
-    end: { x: 537, y: 80.88 },
-    thickness: 2.16,
-    color: rgb(0, 0, 0),
-  });
 }
 
 // Großes, gut sichtbares J/H-Kennzeichen oben links auf Seite 1 (freier
@@ -211,17 +193,14 @@ export async function generateWallboxPDF(state) {
 
   form.flatten();
 
-  // -- immagini: foto + Prüfer-Unterschriftsabdeckung, ERST NACH dem Flatten --
-  // (Reihenfolge wichtig: so kann nichts vom geglätteten Formular mehr
-  // über unseren neuen Bildern liegen. Die weiße Abdeckung deckt die im
-  // Seiteninhalt eingebrannte alte Unterschrift von Branko ab — auf der
-  // Auftraggeber-Seite ist die Zeile im Template bereits leer, dort wird
-  // nichts abgedeckt.)
+  // -- Fotos, ERST NACH dem Flatten zeichnen --
+  // (Reihenfolge wichtig: so kann nichts vom geglätteten Formular mehr über
+  // unseren neuen Bildern liegen. Die im Template eingebrannte Unterschrift
+  // von Branko bleibt bewusst erhalten — sie fungiert als fester Stempel,
+  // vergleichbar mit dem fest hinterlegten Auftraggeber Michael Rogles.)
   const page2 = pages[IMAGE_TARGETS.fotoPruefplakette.page];
   await drawImageContain(pdfDoc, page2, state.fotos?.pruefplakette, IMAGE_TARGETS.fotoPruefplakette);
   await drawImageContain(pdfDoc, page2, state.fotos?.wallboxStatus, IMAGE_TARGETS.fotoWallboxStatus);
-  await drawImageContain(pdfDoc, page2, null, IMAGE_TARGETS.unterschriftPruefer);
-  restorePrueferBorderSegment(page2);
   await drawPruefintervallBadge(pdfDoc, pages[0], state.pruefintervall);
 
   const pdfBytes = await pdfDoc.save();
