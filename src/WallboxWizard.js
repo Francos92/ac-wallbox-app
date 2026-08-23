@@ -556,6 +556,13 @@ export default function WallboxWizard({ onExit }) {
     (async () => {
       const profile = await getProfile();
       const existing = await getActiveDraft('wallbox');
+      if (existing) {
+        existing.messung = (existing.messung || []).map((row) => ({
+          isoVSchuetz: '>999',
+          isoNSchuetz: '>999',
+          ...row,
+        }));
+      }
       setState(existing || createInitialState(profile));
       initialized.current = true;
     })();
