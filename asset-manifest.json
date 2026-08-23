@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.css": "/ac-wallbox-app/static/css/main.68bbec04.css",
-    "main.js": "/ac-wallbox-app/static/js/main.77e6af1e.js",
+    "main.css": "/ac-wallbox-app/static/css/main.3b54a095.css",
+    "main.js": "/ac-wallbox-app/static/js/main.dd317a8c.js",
+    "static/media/Braba logo.svg": "/ac-wallbox-app/static/media/Braba logo.b889fd8be65a0e6b8c6bf3de27b229f0.svg",
     "index.html": "/ac-wallbox-app/index.html",
-    "main.68bbec04.css.map": "/ac-wallbox-app/static/css/main.68bbec04.css.map",
-    "main.77e6af1e.js.map": "/ac-wallbox-app/static/js/main.77e6af1e.js.map"
+    "main.3b54a095.css.map": "/ac-wallbox-app/static/css/main.3b54a095.css.map",
+    "main.dd317a8c.js.map": "/ac-wallbox-app/static/js/main.dd317a8c.js.map"
   },
   "entrypoints": [
-    "static/css/main.68bbec04.css",
-    "static/js/main.77e6af1e.js"
+    "static/css/main.3b54a095.css",
+    "static/js/main.dd317a8c.js"
   ]
 }
