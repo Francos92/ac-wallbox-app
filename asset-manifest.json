@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/ac-wallbox-app/static/css/main.bc653fd4.css",
-    "main.js": "/ac-wallbox-app/static/js/main.3e6bee88.js",
+    "main.css": "/ac-wallbox-app/static/css/main.97458f1e.css",
+    "main.js": "/ac-wallbox-app/static/js/main.f7448466.js",
     "index.html": "/ac-wallbox-app/index.html",
-    "main.bc653fd4.css.map": "/ac-wallbox-app/static/css/main.bc653fd4.css.map",
-    "main.3e6bee88.js.map": "/ac-wallbox-app/static/js/main.3e6bee88.js.map"
+    "main.97458f1e.css.map": "/ac-wallbox-app/static/css/main.97458f1e.css.map",
+    "main.f7448466.js.map": "/ac-wallbox-app/static/js/main.f7448466.js.map"
   },
   "entrypoints": [
-    "static/css/main.bc653fd4.css",
-    "static/js/main.3e6bee88.js"
+    "static/css/main.97458f1e.css",
+    "static/js/main.f7448466.js"
   ]
 }
