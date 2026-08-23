@@ -53,6 +53,9 @@ function createInitialState(profile) {
     },
     ladestation: { anschrift: '', hersteller: '', modell: '', seriennr: '', fehlerstromerkennung: '', anzLadepunkte: '1', anschlussart: 'Buchse, Typ2', strasseOrtHint: '' },
     grund: { type: 'wiederholung', sonstigeText: '' },
+    // 'J' = jährliche, 'H' = halbjährliche Prüfung — aus der Wallbox-Liste
+    // übernommen, leer bei manueller Eingabe ohne Listenauswahl.
+    pruefintervall: '',
     netzform: 'TNCS',
     pruefungNach: { dinvde0100600: false, dinvde0105100: false, dguv3: true },
     evbVnb: '',

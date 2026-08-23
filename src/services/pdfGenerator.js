@@ -188,16 +188,17 @@ function fallbackStrasseOrt(anschrift) {
 }
 
 // Format wie im Referenzprotokoll: "Straße Ort_J_JJJJ-MM-TT_Seriennummer.pdf"
-// ("J" = jährliche/große Prüfung — der einzige Prüftyp, den die App aktuell
-// abbildet).
+// ("J" = jährliche, "H" = halbjährliche Prüfung — aus der Wallbox-Liste
+// übernommen, ohne Listenauswahl standardmäßig "J").
 export function pdfFileName(state) {
   const strasseOrt =
     (state.ladestation?.strasseOrtHint || fallbackStrasseOrt(state.ladestation?.anschrift) || 'Wallbox')
       .replace(/[^\w\- äöüÄÖÜß]/g, '')
       .trim() || 'Wallbox';
+  const intervall = state.pruefintervall || 'J';
   const date = state.abschluss?.datumPruefer || new Date().toISOString().split('T')[0];
   const sn = state.ladestation?.seriennr || '';
-  return `${strasseOrt}_J_${date}_${sn}.pdf`;
+  return `${strasseOrt}_${intervall}_${date}_${sn}.pdf`;
 }
 
 export function downloadBlob(blob, filename) {

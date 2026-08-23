@@ -71,6 +71,7 @@ export default function StepWallboxListe({ state, setState, goNext }) {
     const prefill = wallboxListeRowToState(row);
     setState((s) => ({
       ...s,
+      pruefintervall: prefill.pruefintervall,
       ladestation: { ...s.ladestation, ...prefill.ladestation },
     }));
     goNext();
@@ -178,17 +179,25 @@ export default function StepWallboxListe({ state, setState, goNext }) {
                   className={`wl-row ${done ? 'wl-row-done' : ''} ${selected ? 'wl-row-selected' : ''}`}
                   onClick={() => selectRow(row)}
                 >
-                  <div className="wl-row-main">
-                    <span className="wl-row-title">{row.bezeichnung || '(ohne Bezeichnung)'}</span>
-                    <span className="wl-row-sub">
-                      {row.strasse} {row.hausnr}, {row.plz} {row.ort}
-                    </span>
+                  <div className="wl-row-body">
+                    <div className="wl-row-main">
+                      <span className="wl-row-title">{row.bezeichnung || '(ohne Bezeichnung)'}</span>
+                      <span className="wl-row-sub">
+                        {row.strasse} {row.hausnr}, {row.plz} {row.ort}
+                      </span>
+                    </div>
+                    <div className="wl-row-meta">
+                      <span>{row.seriennummer}</span>
+                      {row.naechstePruefung && <span>fällig {formatDate(row.naechstePruefung)}</span>}
+                      {done && <span className="wl-row-badge">✓ erledigt</span>}
+                    </div>
                   </div>
-                  <div className="wl-row-meta">
-                    <span>{row.seriennummer}</span>
-                    {row.naechstePruefung && <span>fällig {formatDate(row.naechstePruefung)}</span>}
-                    {done && <span className="wl-row-badge">✓ erledigt</span>}
-                  </div>
+                  <span
+                    className={`wl-row-tag ${row.pruefart === 'J' ? 'wl-row-tag-j' : 'wl-row-tag-h'}`}
+                    title={row.pruefart === 'J' ? 'jährliche Prüfung' : 'halbjährliche Prüfung'}
+                  >
+                    {row.pruefart}
+                  </span>
                 </button>
               );
             })}

@@ -1,9 +1,13 @@
 import * as XLSX from 'xlsx';
 
-// Erwartetes Blatt in der monatlichen ESWE-Liste: die offenen großen
-// (jährlichen) Prüfungen. Spalten sind bei allen bisherigen Listen identisch
-// aufgebaut (Stamm, Offen, Geprüft — nur der Blattname unterscheidet sich).
-const SHEET_NAME = 'Offen (Groß) Monat';
+// Die monatliche ESWE-Liste enthält zwei Blätter mit fälligen Prüfungen:
+// "Groß" = jährliche Prüfung (Kennzeichen "J"), "Klein" = halbjährliche
+// Prüfung (Kennzeichen "H"). Spaltenaufbau ist bei beiden identisch, nur
+// die Spalte mit dem Fälligkeitsdatum heißt jeweils anders.
+const SHEETS = [
+  { name: 'Offen (Groß) Monat', pruefart: 'J', naechstePruefungSpalte: 'Nächste große Prüfung' },
+  { name: 'Offen (Klein) Monat', pruefart: 'H', naechstePruefungSpalte: 'Nächste kleine Prüfung' },
+];
 
 const COLUMNS = {
   bezeichnung: 'Bezeichnung',
@@ -18,7 +22,6 @@ const COLUMNS = {
   ansprechpartner: 'Ansprechpartner',
   ansprechpartnerTel: 'Ansprechpartner Telefon',
   ansprechpartnerMail: 'Ansprechpartner Mail',
-  naechstePruefung: 'Nächste große Prüfung',
   bemerkung: 'Bemerkung',
 };
 
@@ -38,31 +41,34 @@ export async function parseWallboxListeFile(file) {
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, { type: 'array' });
 
-  const sheetName = workbook.SheetNames.includes(SHEET_NAME) ? SHEET_NAME : workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+  const parsed = SHEETS.flatMap(({ name, pruefart, naechstePruefungSpalte }) => {
+    if (!workbook.SheetNames.includes(name)) return [];
+    const sheet = workbook.Sheets[name];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-  const parsed = rows
-    .map((row) => ({
-      bezeichnung: String(row[COLUMNS.bezeichnung] || '').trim(),
-      strasse: String(row[COLUMNS.strasse] || '').trim(),
-      hausnr: String(row[COLUMNS.hausnr] || '').trim(),
-      plz: String(row[COLUMNS.plz] || '').trim(),
-      ort: String(row[COLUMNS.ort] || '').trim(),
-      hersteller: String(row[COLUMNS.hersteller] || '').trim(),
-      typ: String(row[COLUMNS.typ] || '').trim(),
-      seriennummer: String(row[COLUMNS.seriennummer] || '').trim(),
-      absicherung: String(row[COLUMNS.absicherung] || '').trim(),
-      ansprechpartner: String(row[COLUMNS.ansprechpartner] || '').trim(),
-      ansprechpartnerTel: String(row[COLUMNS.ansprechpartnerTel] || '').trim(),
-      ansprechpartnerMail: String(row[COLUMNS.ansprechpartnerMail] || '').trim(),
-      naechstePruefung: excelDateToIso(row[COLUMNS.naechstePruefung]),
-      bemerkung: String(row[COLUMNS.bemerkung] || '').trim(),
-    }))
-    // Leere/Kopfzeilen ohne echte Wallbox überspringen
-    .filter((r) => r.bezeichnung || r.seriennummer);
+    return rows
+      .map((row) => ({
+        pruefart,
+        bezeichnung: String(row[COLUMNS.bezeichnung] || '').trim(),
+        strasse: String(row[COLUMNS.strasse] || '').trim(),
+        hausnr: String(row[COLUMNS.hausnr] || '').trim(),
+        plz: String(row[COLUMNS.plz] || '').trim(),
+        ort: String(row[COLUMNS.ort] || '').trim(),
+        hersteller: String(row[COLUMNS.hersteller] || '').trim(),
+        typ: String(row[COLUMNS.typ] || '').trim(),
+        seriennummer: String(row[COLUMNS.seriennummer] || '').trim(),
+        absicherung: String(row[COLUMNS.absicherung] || '').trim(),
+        ansprechpartner: String(row[COLUMNS.ansprechpartner] || '').trim(),
+        ansprechpartnerTel: String(row[COLUMNS.ansprechpartnerTel] || '').trim(),
+        ansprechpartnerMail: String(row[COLUMNS.ansprechpartnerMail] || '').trim(),
+        naechstePruefung: excelDateToIso(row[naechstePruefungSpalte]),
+        bemerkung: String(row[COLUMNS.bemerkung] || '').trim(),
+      }))
+      // Leere/Kopfzeilen ohne echte Wallbox überspringen
+      .filter((r) => r.bezeichnung || r.seriennummer);
+  });
 
-  return { sheetName, rows: parsed };
+  return { rows: parsed };
 }
 
 // Auftraggeber ist immer ESWE/Michael Rogles (fixer Standard, siehe
@@ -73,6 +79,7 @@ export function wallboxListeRowToState(row) {
     .filter(Boolean)
     .join(', ');
   return {
+    pruefintervall: row.pruefart || '',
     ladestation: {
       anschrift: addressParts,
       hersteller: row.hersteller || '',
