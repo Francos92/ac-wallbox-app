@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getWallboxListe, saveWallboxListe, listArchive } from './services/database';
+import { getWallboxListe, saveWallboxListe, deleteWallboxListe, listArchive } from './services/database';
 import { parseWallboxListeFile, wallboxListeRowToState } from './services/wallboxListeImport';
 
 function formatDate(iso) {
@@ -15,6 +15,7 @@ export default function StepWallboxListe({ state, setState, goNext }) {
   const [error, setError] = useState('');
   const [doneSerials, setDoneSerials] = useState(new Set());
   const [query, setQuery] = useState('');
+  const [confirmStep, setConfirmStep] = useState(0); // 0=aus, 1=erste Warnung, 2=letzte Warnung
   const fileInputRef = useRef(null);
 
   const loadDoneSerials = async (currentListe) => {
@@ -58,6 +59,14 @@ export default function StepWallboxListe({ state, setState, goNext }) {
     }
   };
 
+  const handleDeleteConfirmed = async () => {
+    await deleteWallboxListe();
+    setListe(null);
+    setDoneSerials(new Set());
+    setQuery('');
+    setConfirmStep(0);
+  };
+
   const selectRow = (row) => {
     const prefill = wallboxListeRowToState(row);
     setState((s) => ({
@@ -95,16 +104,51 @@ export default function StepWallboxListe({ state, setState, goNext }) {
         style={{ display: 'none' }}
         onChange={handleFile}
       />
-      <button
-        type="button"
-        className="btn-primary"
-        disabled={importing}
-        onClick={() => fileInputRef.current.click()}
-      >
-        {importing ? 'Wird geladen…' : liste ? 'Neue Liste laden' : 'Liste laden (Excel)'}
-      </button>
+      <div className="wl-actions">
+        <button
+          type="button"
+          className="btn-primary"
+          disabled={importing}
+          onClick={() => fileInputRef.current.click()}
+        >
+          {importing ? 'Wird geladen…' : liste ? 'Neue Liste laden' : 'Liste laden (Excel)'}
+        </button>
+        {liste && (
+          <button type="button" className="btn-danger" onClick={() => setConfirmStep(1)}>
+            Liste löschen
+          </button>
+        )}
+      </div>
 
       {error && <p className="wl-error">{error}</p>}
+
+      {confirmStep === 1 && (
+        <div className="modal-backdrop">
+          <div className="modal-box">
+            <h3>Liste wirklich löschen?</h3>
+            <p>
+              Die geladene Liste mit {rows.length} Wallboxen und der Erledigt-Status werden entfernt.
+              Bereits gespeicherte Prüfprotokolle im Archiv bleiben davon unberührt.
+            </p>
+            <div className="modal-actions">
+              <button type="button" className="btn-secondary" onClick={() => setConfirmStep(0)}>Abbrechen</button>
+              <button type="button" className="btn-danger" onClick={() => setConfirmStep(2)}>Ja, löschen</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmStep === 2 && (
+        <div className="modal-backdrop">
+          <div className="modal-box">
+            <h3>Bist du wirklich sicher?</h3>
+            <p>Das kann nicht rückgängig gemacht werden. Die Liste muss danach neu aus Excel geladen werden.</p>
+            <div className="modal-actions">
+              <button type="button" className="btn-secondary" onClick={() => setConfirmStep(0)}>Abbrechen</button>
+              <button type="button" className="btn-danger" onClick={handleDeleteConfirmed}>Ja, endgültig löschen</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <p className="step-hint">Lädt…</p>

@@ -65,10 +65,9 @@ export async function parseWallboxListeFile(file) {
   return { sheetName, rows: parsed };
 }
 
-// Aus der Wallbox-Liste wird bewusst NUR "Anschrift der Ladestation"
-// übernommen. Auftraggeber ist immer ESWE/Michael Rogles (fixer Standard,
-// siehe createInitialState) und die übrigen Ladestation-Felder (Hersteller,
-// Modell, Serien-Nr.) werden weiterhin manuell vor Ort erfasst.
+// Auftraggeber ist immer ESWE/Michael Rogles (fixer Standard, siehe
+// createInitialState) — aus der Wallbox-Liste übernommen wird nur die
+// Ladestation: Anschrift, Hersteller, Modell und Serien-Nr.
 export function wallboxListeRowToState(row) {
   const addressParts = [`${row.strasse} ${row.hausnr}`.trim(), `${row.plz} ${row.ort}`.trim()]
     .filter(Boolean)
@@ -76,6 +75,9 @@ export function wallboxListeRowToState(row) {
   return {
     ladestation: {
       anschrift: addressParts,
+      hersteller: row.hersteller || '',
+      modell: row.typ || '',
+      seriennr: row.seriennummer || '',
       // Sauberer "Straße Ort"-Ausschnitt (ohne Hausnr./PLZ) für den
       // PDF-Dateinamen — direkt aus den strukturierten Excel-Spalten,
       // zuverlässiger als ihn später aus dem freien Anschrift-Text zu raten.

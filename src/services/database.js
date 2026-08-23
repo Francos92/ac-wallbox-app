@@ -139,3 +139,8 @@ export async function getWallboxListe() {
   const result = await tx(db, 'wallboxListe', 'readonly', (store) => store.get(WALLBOX_LISTE_KEY));
   return result || null;
 }
+
+export async function deleteWallboxListe() {
+  const db = await openDB();
+  await tx(db, 'wallboxListe', 'readwrite', (store) => store.delete(WALLBOX_LISTE_KEY));
+}

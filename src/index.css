@@ -424,4 +424,29 @@ input { font-family: inherit; }
 .wl-row-badge { color: var(--ok-green); font-weight: 700; }
 .wl-row-done { border-color: var(--ok-green); background: #f2faf5; }
 .wl-row-selected { border-color: var(--braba-red); box-shadow: 0 0 0 2px rgba(200,30,44,0.15); }
+.wl-actions { display: flex; gap: 10px; align-items: stretch; }
+
+/* Bestätigungs-Popup (z.B. Liste löschen) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 46, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+.modal-box {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+}
+.modal-box h3 { margin: 0 0 10px; }
+.modal-box p { color: #4b5563; margin: 0 0 20px; }
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions button { flex: 1; }
 .archive-item-actions { display: flex; gap: 8px; }
