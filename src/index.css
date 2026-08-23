@@ -477,3 +477,37 @@ input { font-family: inherit; }
 .modal-actions { display: flex; gap: 10px; }
 .modal-actions button { flex: 1; }
 .archive-item-actions { display: flex; gap: 8px; }
+
+/* Password-Gate */
+.password-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 20px;
+}
+.password-gate-box {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.password-gate-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.password-gate-box input {
+  text-align: center;
+  font-size: 1.3rem;
+  letter-spacing: 0.3em;
+}
+.password-gate-error { color: var(--nio-red); font-size: 0.9rem; text-align: center; margin: -8px 0 0; }

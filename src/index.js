@@ -5,6 +5,7 @@ import HomeMenu from './HomeMenu';
 import WallboxWizard from './WallboxWizard';
 import ArchiveView from './ArchiveView';
 import ProfileSettings from './ProfileSettings';
+import PasswordGate from './PasswordGate';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 function App() {
@@ -27,6 +28,10 @@ function App() {
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+root.render(
+  <PasswordGate>
+    <App />
+  </PasswordGate>
+);
 
 serviceWorkerRegistration.register();
