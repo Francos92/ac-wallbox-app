@@ -92,8 +92,6 @@ function createInitialState(profile) {
       ort: profile?.ort || 'Wiesbaden',
       datumAuftraggeber: '',
       datumPruefer: today,
-      unterschriftAuftraggeber: null,
-      unterschriftPruefer: null,
     },
   };
 }
@@ -448,7 +446,7 @@ StepErproben.isValid = (s) => ERPROBEN_ITEMS.every((it) => !!s.erproben[it.key])
 // ---------------------------------------------------------------------
 // Step: Messung
 // ---------------------------------------------------------------------
-function MessungRow({ row, index, update }) {
+function MessungRow({ row, index, update, compact }) {
   const p = (key) => `messung.${index}.${key}`;
   const set = (key, val) => update(p(key), val);
   return (
@@ -460,26 +458,39 @@ function MessungRow({ row, index, update }) {
         <label className="field"><span>Kabel-Typ</span><input value={row.kabelTyp} onChange={(e) => set('kabelTyp', e.target.value)} placeholder="z.B. NYY-J" /></label>
         <label className="field"><span>Aderzahl</span><input value={row.ader} onChange={(e) => set('ader', e.target.value)} placeholder="z.B. 5" /></label>
         <label className="field"><span>Querschnitt [mm²]</span><input value={row.querschnitt} onChange={(e) => set('querschnitt', e.target.value)} placeholder="z.B. 5x2,5" /></label>
-        <label className="field"><span>Isowiderstand v.Schütz [MΩ]</span><input value={row.isoVSchuetz} onChange={(e) => set('isoVSchuetz', e.target.value)} placeholder="z.B. >999" /></label>
-        <label className="field"><span>Isowiderstand n.Schütz [MΩ]</span><input value={row.isoNSchuetz} onChange={(e) => set('isoNSchuetz', e.target.value)} placeholder="z.B. >999" /></label>
+        {!compact && (
+          <>
+            <label className="field"><span>Isowiderstand v.Schütz [MΩ]</span><input value={row.isoVSchuetz} onChange={(e) => set('isoVSchuetz', e.target.value)} placeholder="z.B. >999" /></label>
+            <label className="field"><span>Isowiderstand n.Schütz [MΩ]</span><input value={row.isoNSchuetz} onChange={(e) => set('isoNSchuetz', e.target.value)} placeholder="z.B. >999" /></label>
+          </>
+        )}
         <label className="field"><span>Art (B/C/D)</span><input value={row.art} onChange={(e) => set('art', e.target.value)} placeholder="z.B. C" /></label>
         <label className="field"><span>IN [A]</span><input value={row.inA} onChange={(e) => set('inA', e.target.value)} placeholder="z.B. 32" /></label>
-        <label className="field"><span>Zs [Ω]</span><input value={row.zs} onChange={(e) => set('zs', e.target.value)} placeholder="z.B. 0,35" /></label>
-        <label className="field"><span>Ik (bei Zs) [A]</span><input value={row.zsIk} onChange={(e) => set('zsIk', e.target.value)} placeholder="z.B. 657" /></label>
-        <label className="field"><span>Zi [Ω]</span><input value={row.zi} onChange={(e) => set('zi', e.target.value)} placeholder="z.B. 0,42" /></label>
-        <label className="field"><span>Ik (bei Zi) [A]</span><input value={row.ziIk} onChange={(e) => set('ziIk', e.target.value)} placeholder="z.B. 550" /></label>
+        {!compact && (
+          <>
+            <label className="field"><span>Zs [Ω]</span><input value={row.zs} onChange={(e) => set('zs', e.target.value)} placeholder="z.B. 0,35" /></label>
+            <label className="field"><span>Ik (bei Zs) [A]</span><input value={row.zsIk} onChange={(e) => set('zsIk', e.target.value)} placeholder="z.B. 657" /></label>
+            <label className="field"><span>Zi [Ω]</span><input value={row.zi} onChange={(e) => set('zi', e.target.value)} placeholder="z.B. 0,42" /></label>
+            <label className="field"><span>Ik (bei Zi) [A]</span><input value={row.ziIk} onChange={(e) => set('ziIk', e.target.value)} placeholder="z.B. 550" /></label>
+          </>
+        )}
         <label className="field"><span>RCD Typ</span><input value={row.rcdTyp} onChange={(e) => set('rcdTyp', e.target.value)} placeholder="z.B. A" /></label>
         <label className="field"><span>RCD In [A]</span><input value={row.rcdIn} onChange={(e) => set('rcdIn', e.target.value)} placeholder="z.B. 63" /></label>
-        <label className="field"><span>I∆N [mA]</span><input value={row.iDeltaN} onChange={(e) => set('iDeltaN', e.target.value)} placeholder="z.B. 30" /></label>
-        <label className="field"><span>IA [mA]</span><input value={row.iA} onChange={(e) => set('iA', e.target.value)} placeholder="z.B. 21" /></label>
-        <label className="field"><span>tA [ms]</span><input value={row.tA} onChange={(e) => set('tA', e.target.value)} placeholder="z.B. 25" /></label>
-        <label className="field"><span>UB [V]</span><input value={row.uB} onChange={(e) => set('uB', e.target.value)} placeholder="z.B. 24" /></label>
+        {!compact && (
+          <>
+            <label className="field"><span>I∆N [mA]</span><input value={row.iDeltaN} onChange={(e) => set('iDeltaN', e.target.value)} placeholder="z.B. 30" /></label>
+            <label className="field"><span>IA [mA]</span><input value={row.iA} onChange={(e) => set('iA', e.target.value)} placeholder="z.B. 21" /></label>
+            <label className="field"><span>tA [ms]</span><input value={row.tA} onChange={(e) => set('tA', e.target.value)} placeholder="z.B. 25" /></label>
+            <label className="field"><span>UB [V]</span><input value={row.uB} onChange={(e) => set('uB', e.target.value)} placeholder="z.B. 24" /></label>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
 function StepMessung({ state, update, setState }) {
+  const compact = state.pruefintervall === 'H';
   const addRow = () => {
     if (state.messung.length >= 5) return;
     setState((s) => ({ ...s, messung: [...s.messung, emptyMessungRow()] }));
@@ -490,10 +501,15 @@ function StepMessung({ state, update, setState }) {
   return (
     <div className="step">
       <h2>Messung</h2>
-      <Field label="Isowiderstand — Uprüf [V]" path="uPruef" state={state} update={update} />
+      {compact && (
+        <p className="step-hint">
+          Halbjährliche Prüfung: nur die vorhandenen Sicherungen erfassen, keine Messwerte nötig.
+        </p>
+      )}
+      {!compact && <Field label="Isowiderstand — Uprüf [V]" path="uPruef" state={state} update={update} />}
       {state.messung.map((row, i) => (
         <div key={i}>
-          <MessungRow row={row} index={i} update={update} />
+          <MessungRow row={row} index={i} update={update} compact={compact} />
           {state.messung.length > 1 && (
             <button type="button" className="btn-secondary" onClick={() => removeRow(i)}>Stromkreis entfernen</button>
           )}

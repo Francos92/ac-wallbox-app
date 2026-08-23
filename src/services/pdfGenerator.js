@@ -1,4 +1,4 @@
-import { PDFDocument, PDFTextField, PDFCheckBox, rgb } from 'pdf-lib';
+import { PDFDocument, PDFTextField, PDFCheckBox, StandardFonts, rgb } from 'pdf-lib';
 import {
   TEXT_FIELDS,
   BESICHTIGEN_ITEMS,
@@ -9,6 +9,12 @@ import {
 } from './wallboxFieldMap';
 
 const getPath = (obj, path) => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+
+// Messwerte (im Unterschied zu den reinen Sicherungs-/Stromkreis-Angaben),
+// die bei halbjährlicher Prüfung (H) nicht ins PDF übernommen werden.
+const MESSUNG_WERT_KEYS = new Set([
+  'isoVSchuetz', 'isoNSchuetz', 'zs', 'zsIk', 'zi', 'ziIk', 'iDeltaN', 'iA', 'tA', 'uB',
+]);
 
 let templateBytesCache = null;
 async function loadTemplateBytes() {
@@ -64,6 +70,39 @@ function fillTriState(form, items, stateGroup) {
 // über das Form-API geleert werden).
 function coverWithWhite(page, target) {
   page.drawRectangle({ x: target.x, y: target.y, width: target.width, height: target.height, color: rgb(1, 1, 1) });
+}
+
+// Die weiße Abdeckung der Prüfer-Unterschrift überlappt minimal die untere
+// Tabellenlinie (im Original an dieser Stelle vom Signatur-Schnörkel
+// durchkreuzt) — das kurze Segment wird danach wieder nachgezogen, damit
+// die Linie durchgehend bleibt.
+function restorePrueferBorderSegment(page) {
+  page.drawLine({
+    start: { x: 459, y: 81.6 },
+    end: { x: 510, y: 81.6 },
+    thickness: 1.5,
+    color: rgb(0, 0, 0),
+  });
+}
+
+// Großes, gut sichtbares J/H-Kennzeichen oben links auf Seite 1 (freier
+// Bereich zwischen Seitenrand und Titel/Logo) — zeigt auf einen Blick, ob
+// es sich um eine jährliche oder halbjährliche Prüfung handelt.
+async function drawPruefintervallBadge(pdfDoc, page, pruefintervall) {
+  const letter = pruefintervall === 'H' ? 'H' : 'J';
+  const color = letter === 'H' ? rgb(0.118, 0.541, 0.294) : rgb(0.086, 0.133, 0.247);
+  const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const box = { x: 20, y: 793, width: 40, height: 38 };
+  page.drawRectangle({ ...box, color });
+  const fontSize = 26;
+  const textWidth = font.widthOfTextAtSize(letter, fontSize);
+  page.drawText(letter, {
+    x: box.x + (box.width - textWidth) / 2,
+    y: box.y + (box.height - fontSize) / 2 + 4,
+    size: fontSize,
+    font,
+    color: rgb(1, 1, 1),
+  });
 }
 
 async function drawImageContain(pdfDoc, page, dataUrl, target) {
@@ -127,11 +166,18 @@ export async function generateWallboxPDF(state) {
   fillTriState(form, ERPROBEN_ITEMS, state.erproben);
 
   // -- Messung (fino a 5 righe) --
+  // Bei halbjährlicher Prüfung (H) werden nur die vorhandenen Sicherungen
+  // dokumentiert, keine Messwerte — auch wenn im State noch Default-Werte
+  // (z.B. Isowiderstand ">999") stehen, werden diese hier bewusst nicht
+  // ins PDF geschrieben.
+  const isHalbjaehrlich = state.pruefintervall === 'H';
+  if (isHalbjaehrlich) setTextSafe(form, 'comb_11', '');
   const messungRows = state.messung || [];
   MESSUNG_ROW_FIELDS.forEach((rowFields, i) => {
     const row = messungRows[i];
     if (!row) return;
     Object.entries(rowFields).forEach(([key, fieldName]) => {
+      if (isHalbjaehrlich && MESSUNG_WERT_KEYS.has(key)) return;
       setTextSafe(form, fieldName, row[key]);
     });
   });
@@ -162,16 +208,18 @@ export async function generateWallboxPDF(state) {
 
   form.flatten();
 
-  // -- immagini: foto + firme, ERST NACH dem Flatten zeichnen --
+  // -- immagini: foto + Prüfer-Unterschriftsabdeckung, ERST NACH dem Flatten --
   // (Reihenfolge wichtig: so kann nichts vom geglätteten Formular mehr
-  // über unseren neuen Bildern liegen. Die weiße Abdeckung in
-  // drawImageContain() deckt zusätzlich die im Seiteninhalt eingebrannte
-  // alte Unterschrift ab.)
+  // über unseren neuen Bildern liegen. Die weiße Abdeckung deckt die im
+  // Seiteninhalt eingebrannte alte Unterschrift von Branko ab — auf der
+  // Auftraggeber-Seite ist die Zeile im Template bereits leer, dort wird
+  // nichts abgedeckt.)
   const page2 = pages[IMAGE_TARGETS.fotoPruefplakette.page];
   await drawImageContain(pdfDoc, page2, state.fotos?.pruefplakette, IMAGE_TARGETS.fotoPruefplakette);
   await drawImageContain(pdfDoc, page2, state.fotos?.wallboxStatus, IMAGE_TARGETS.fotoWallboxStatus);
-  await drawImageContain(pdfDoc, page2, state.abschluss?.unterschriftAuftraggeber, IMAGE_TARGETS.unterschriftAuftraggeber);
-  await drawImageContain(pdfDoc, page2, state.abschluss?.unterschriftPruefer, IMAGE_TARGETS.unterschriftPruefer);
+  await drawImageContain(pdfDoc, page2, null, IMAGE_TARGETS.unterschriftPruefer);
+  restorePrueferBorderSegment(page2);
+  await drawPruefintervallBadge(pdfDoc, pages[0], state.pruefintervall);
 
   const pdfBytes = await pdfDoc.save();
   return new Blob([pdfBytes], { type: 'application/pdf' });

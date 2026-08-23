@@ -141,16 +141,21 @@ export const MESSUNG_ROW_FIELDS = [
   },
 ];
 
-// Le due foto e le due firme non sono campi AcroForm standard nel PDF originale
-// (sono immagini disegnate a mano libera / pulsanti immagine). Li posizioniamo
-// disegnando direttamente sull'pagina alle coordinate del rettangolo del widget
-// originale (per le foto) o stimate visivamente (per le firme, da verificare
-// nel primo test reale).
+// Die beiden Fotos sind keine Standard-AcroForm-Felder im Original-PDF
+// (handgezeichnete Bilder/Bildbuttons). Sie werden direkt auf die Seite an
+// den Koordinaten des ursprünglichen Widget-Rechtecks gezeichnet.
+//
+// unterschriftPruefer deckt NUR die im Template fest eingebrannte
+// Original-Unterschrift von Branko ab (kein Formularfeld, kann nicht über
+// die AcroForm-API geleert werden) — Koordinaten wurden per Pixelmessung
+// am gerenderten Template ermittelt (nicht mehr geschätzt). Auf der
+// Auftraggeber-Seite ist die Unterschriftszeile im Template bereits leer,
+// dort wird daher nichts mehr abgedeckt (das hatte zuvor fälschlich das
+// "Unterschrift:"-Label mit verdeckt).
 export const IMAGE_TARGETS = {
   fotoPruefplakette: { page: 1, x: 62.9, y: 339.2, width: 196.6, height: 148.5 },
   fotoWallboxStatus: { page: 1, x: 302.1, y: 163.4, width: 231.1, height: 324.3 },
-  unterschriftAuftraggeber: { page: 1, x: 175, y: 72, width: 110, height: 26 },
-  unterschriftPruefer: { page: 1, x: 405, y: 72, width: 110, height: 26 },
+  unterschriftPruefer: { page: 1, x: 459, y: 65, width: 51, height: 58 },
 };
 
 export const TEMPLATE_URL = process.env.PUBLIC_URL + '/assets/wallbox-template.pdf';
