@@ -8,26 +8,41 @@ function formatDate(iso) {
   return d && m && y ? `${d}.${m}.${y}` : iso;
 }
 
+function formatDateTime(isoDateTime) {
+  const d = new Date(isoDateTime);
+  if (Number.isNaN(d.getTime())) return '';
+  const datePart = d.toLocaleDateString('de-DE');
+  const timePart = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  return `${datePart} um ${timePart} Uhr`;
+}
+
 export default function StepWallboxListe({ state, setState, goNext }) {
   const [liste, setListe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState('');
-  const [doneSerials, setDoneSerials] = useState(new Set());
+  const [doneMap, setDoneMap] = useState(new Map());
   const [query, setQuery] = useState('');
   const [confirmStep, setConfirmStep] = useState(0); // 0=aus, 1=erste Warnung, 2=letzte Warnung
   const fileInputRef = useRef(null);
 
   const loadDoneSerials = async (currentListe) => {
     if (!currentListe) {
-      setDoneSerials(new Set());
+      setDoneMap(new Map());
       return;
     }
     const archive = await listArchive('wallbox');
-    const done = archive
+    const map = new Map();
+    archive
       .filter((e) => e.summary?.seriennr && new Date(e.savedAt) >= new Date(currentListe.loadedAt))
-      .map((e) => e.summary.seriennr);
-    setDoneSerials(new Set(done));
+      .forEach((e) => {
+        // Bei Mehrfach-Prüfungen derselben Wallbox den neuesten Zeitstempel behalten.
+        const existing = map.get(e.summary.seriennr);
+        if (!existing || new Date(e.savedAt) > new Date(existing)) {
+          map.set(e.summary.seriennr, e.savedAt);
+        }
+      });
+    setDoneMap(map);
   };
 
   useEffect(() => {
@@ -62,7 +77,7 @@ export default function StepWallboxListe({ state, setState, goNext }) {
   const handleDeleteConfirmed = async () => {
     await deleteWallboxListe();
     setListe(null);
-    setDoneSerials(new Set());
+    setDoneMap(new Map());
     setQuery('');
     setConfirmStep(0);
   };
@@ -159,7 +174,7 @@ export default function StepWallboxListe({ state, setState, goNext }) {
         <>
           <p className="wl-meta">
             {rows.length} Wallboxen · geladen am {new Date(liste.loadedAt).toLocaleDateString('de-DE')} ·{' '}
-            {doneSerials.size} erledigt
+            {doneMap.size} erledigt
           </p>
           <input
             type="text"
@@ -170,7 +185,8 @@ export default function StepWallboxListe({ state, setState, goNext }) {
           />
           <div className="wl-list">
             {filtered.map((row, i) => {
-              const done = row.seriennummer && doneSerials.has(row.seriennummer);
+              const doneAt = row.seriennummer ? doneMap.get(row.seriennummer) : null;
+              const done = !!doneAt;
               const selected = row.seriennummer && row.seriennummer === currentSeriennr;
               return (
                 <button
@@ -186,10 +202,12 @@ export default function StepWallboxListe({ state, setState, goNext }) {
                         {row.strasse} {row.hausnr}, {row.plz} {row.ort}
                       </span>
                     </div>
+                    {done && (
+                      <div className="wl-row-donetime">✓ erledigt am {formatDateTime(doneAt)}</div>
+                    )}
                     <div className="wl-row-meta">
                       <span>{row.seriennummer}</span>
                       {row.naechstePruefung && <span>fällig {formatDate(row.naechstePruefung)}</span>}
-                      {done && <span className="wl-row-badge">✓ erledigt</span>}
                     </div>
                   </div>
                   <span

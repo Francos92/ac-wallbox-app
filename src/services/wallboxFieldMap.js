@@ -155,7 +155,7 @@ export const MESSUNG_ROW_FIELDS = [
 export const IMAGE_TARGETS = {
   fotoPruefplakette: { page: 1, x: 62.9, y: 339.2, width: 196.6, height: 148.5 },
   fotoWallboxStatus: { page: 1, x: 302.1, y: 163.4, width: 231.1, height: 324.3 },
-  unterschriftPruefer: { page: 1, x: 459, y: 65, width: 51, height: 58 },
+  unterschriftPruefer: { page: 1, x: 459, y: 60, width: 57, height: 68 },
 };
 
 export const TEMPLATE_URL = process.env.PUBLIC_URL + '/assets/wallbox-template.pdf';

@@ -440,6 +440,16 @@ input { font-family: inherit; }
 }
 .wl-row-badge { color: var(--ok-green); font-weight: 700; }
 .wl-row-done { border-color: var(--ok-green); background: #f2faf5; }
+.wl-row-donetime {
+  text-align: center;
+  color: var(--ok-green);
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: #dff5e6;
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin: 2px 0;
+}
 .wl-row-selected { border-color: var(--braba-red); box-shadow: 0 0 0 2px rgba(200,30,44,0.15); }
 .wl-actions { display: flex; gap: 10px; align-items: stretch; }
 

@@ -72,15 +72,18 @@ function coverWithWhite(page, target) {
   page.drawRectangle({ x: target.x, y: target.y, width: target.width, height: target.height, color: rgb(1, 1, 1) });
 }
 
-// Die weiße Abdeckung der Prüfer-Unterschrift überlappt minimal die untere
-// Tabellenlinie (im Original an dieser Stelle vom Signatur-Schnörkel
-// durchkreuzt) — das kurze Segment wird danach wieder nachgezogen, damit
-// die Linie durchgehend bleibt.
+// Die weiße Abdeckung der Prüfer-Unterschrift überlappt die untere Tabellen-
+// linie der Zelle (im Original an dieser Stelle vom Signatur-Schnörkel
+// durchkreuzt). Statt nur das überdeckte Stück zu ergänzen (führte zu einem
+// leicht versetzten, sichtbaren Bruch in der Linie), wird die GESAMTE
+// untere Linie der Prüfer-Zelle neu gezeichnet — exakt an Position und
+// Stärke des Originals (per Vektor-Analyse des Templates ermittelt), damit
+// sie garantiert durchgehend und sauber wirkt.
 function restorePrueferBorderSegment(page) {
   page.drawLine({
-    start: { x: 459, y: 81.6 },
-    end: { x: 510, y: 81.6 },
-    thickness: 1.5,
+    start: { x: 299, y: 80.88 },
+    end: { x: 537, y: 80.88 },
+    thickness: 2.16,
     color: rgb(0, 0, 0),
   });
 }
