@@ -62,7 +62,6 @@ export default function StepWallboxListe({ state, setState, goNext }) {
     const prefill = wallboxListeRowToState(row);
     setState((s) => ({
       ...s,
-      auftraggeber: { ...s.auftraggeber, ...prefill.auftraggeber },
       ladestation: { ...s.ladestation, ...prefill.ladestation },
     }));
     goNext();

@@ -36,7 +36,15 @@ function createInitialState(profile) {
     moduleType: 'wallbox',
     status: 'draft',
     createdAt: new Date().toISOString(),
-    auftraggeber: { name: '', firma: '', anschrift: '', tel: '' },
+    // Auftraggeber ist immer ESWE Versorgungs AG (vertreten durch Michael
+    // Rogles) — der eigentliche Vertragspartner für alle Prüfungen aus der
+    // Wallbox-Liste, unabhängig vom lokalen Ansprechpartner vor Ort.
+    auftraggeber: {
+      name: profile?.auftraggeber?.name || 'Michael Rogles',
+      firma: profile?.auftraggeber?.firma || 'ESWE Versorgungs AG',
+      anschrift: profile?.auftraggeber?.anschrift || 'Konradinerallee 25, 65189 Wiesbaden',
+      tel: profile?.auftraggeber?.tel || '',
+    },
     pruefer: {
       name: profile?.pruefer?.name || 'Branko Pavlovic',
       firma: profile?.pruefer?.firma || 'BraBa Elektrotechnik',
