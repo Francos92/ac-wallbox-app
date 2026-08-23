@@ -109,8 +109,12 @@ const rcdShortCode = (value) => {
 
 function FehlerstromerkennungField({ state, setState }) {
   const value = state.ladestation.fehlerstromerkennung;
-  const isPreset = value === '' || value === 'A-RCD' || value === 'B-RCD';
-  const selectValue = isPreset ? value : 'custom';
+  const isPresetValue = value === 'A-RCD' || value === 'B-RCD';
+  // Eigener Zustand für den "Andere…"-Modus: der eigentliche Wert ist am
+  // Anfang leer ('') — würde man den Modus allein daraus ableiten, würde
+  // die Auswahl beim ersten Tastendruck sofort wieder auf "– wählen –"
+  // zurückspringen und das Textfeld verschwinden, bevor man etwas tippen kann.
+  const [customMode, setCustomMode] = useState(!isPresetValue && value !== '');
 
   // Spiegelt die Auswahl immer 1:1 in ALLE Messung-Zeilen (RCD Typ) —
   // keine "nur wenn leer"-Ausnahme, damit die Synchronisierung nie
@@ -123,25 +127,36 @@ function FehlerstromerkennungField({ state, setState }) {
     });
   };
 
+  const handleSelectChange = (e) => {
+    const v = e.target.value;
+    if (v === 'custom') {
+      setCustomMode(true);
+      applyValue('');
+    } else {
+      setCustomMode(false);
+      applyValue(v);
+    }
+  };
+
+  const selectValue = customMode ? 'custom' : (isPresetValue ? value : '');
+
   return (
     <label className="field">
       <span>Fehlerstromerkennung</span>
-      <select
-        value={selectValue}
-        onChange={(e) => applyValue(e.target.value === 'custom' ? '' : e.target.value)}
-      >
+      <select value={selectValue} onChange={handleSelectChange}>
         <option value="">– wählen –</option>
         <option value="A-RCD">A-RCD</option>
         <option value="B-RCD">B-RCD</option>
         <option value="custom">Andere…</option>
       </select>
-      {selectValue === 'custom' && (
+      {customMode && (
         <input
           type="text"
           placeholder="z.B. Typ F, Typ B+"
           value={value}
           onChange={(e) => applyValue(e.target.value)}
           style={{ marginTop: 8 }}
+          autoFocus
         />
       )}
     </label>
