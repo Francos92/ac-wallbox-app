@@ -213,6 +213,27 @@ input { font-family: inherit; }
   color: white;
 }
 
+/* Master-Toggle (Alle auf i.O. setzen) */
+.master-io-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.master-io-row input { width: 22px; height: 22px; accent-color: var(--ok-green); }
+.master-io-row.active {
+  border-color: var(--ok-green);
+  background: #e9f7ef;
+  color: var(--ok-green);
+}
+
 /* TriState */
 .tristate-row {
   display: flex;

@@ -246,14 +246,40 @@ StepGrund.isValid = (s) => {
 };
 
 // ---------------------------------------------------------------------
+// Master-Toggle: setzt/räumt alle TriState-Positionen einer Gruppe auf i.O.
+// ---------------------------------------------------------------------
+function MasterIOToggle({ allChecked, onToggle }) {
+  return (
+    <label className={`master-io-row ${allChecked ? 'active' : ''}`}>
+      <input type="checkbox" checked={allChecked} onChange={onToggle} />
+      <span>Alle auf i.O. setzen</span>
+    </label>
+  );
+}
+
+// ---------------------------------------------------------------------
 // Step: Besichtigen
 // ---------------------------------------------------------------------
-function StepBesichtigen({ state, update }) {
+function StepBesichtigen({ state, update, setState }) {
+  const items = BESICHTIGEN_ITEMS.filter((it) => !it.freeLabel);
+  const allIO = items.every((it) => state.besichtigen[it.key] === 'io');
+
+  const toggleAllIO = () => {
+    setState((s) => ({
+      ...s,
+      besichtigen: {
+        ...s.besichtigen,
+        ...Object.fromEntries(items.map((it) => [it.key, allIO ? null : 'io'])),
+      },
+    }));
+  };
+
   return (
     <div className="step">
       <h2>Besichtigen</h2>
       <p className="step-hint">Für jede Position i.O. / n.i.O. / entfällt wählen.</p>
-      {BESICHTIGEN_ITEMS.filter((it) => !it.freeLabel).map((item) => (
+      <MasterIOToggle allChecked={allIO} onToggle={toggleAllIO} />
+      {items.map((item) => (
         <TriState
           key={item.key}
           label={item.label}
@@ -282,11 +308,24 @@ StepBesichtigen.isValid = (s) =>
 // ---------------------------------------------------------------------
 // Step: Erproben
 // ---------------------------------------------------------------------
-function StepErproben({ state, update }) {
+function StepErproben({ state, update, setState }) {
+  const allIO = ERPROBEN_ITEMS.every((it) => state.erproben[it.key] === 'io');
+
+  const toggleAllIO = () => {
+    setState((s) => ({
+      ...s,
+      erproben: {
+        ...s.erproben,
+        ...Object.fromEntries(ERPROBEN_ITEMS.map((it) => [it.key, allIO ? null : 'io'])),
+      },
+    }));
+  };
+
   return (
     <div className="step">
       <h2>Erproben</h2>
       <p className="step-hint">Für jede Position i.O. / n.i.O. / entfällt wählen.</p>
+      <MasterIOToggle allChecked={allIO} onToggle={toggleAllIO} />
       {ERPROBEN_ITEMS.map((item) => (
         <TriState
           key={item.key}
