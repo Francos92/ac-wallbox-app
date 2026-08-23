@@ -102,20 +102,23 @@ function Field({ label, path, state, update, type = 'text', placeholder }) {
 // Ableitung der Kurzform ("A"/"B") aus der gewählten Fehlerstromerkennung,
 // für das RCD-Typ-Feld in der Messung-Tabelle.
 const rcdShortCode = (value) => {
-  if (value === 'Typ A') return 'A';
-  if (value === 'Typ B') return 'B';
+  if (value === 'A-RCD') return 'A';
+  if (value === 'B-RCD') return 'B';
   return value || '';
 };
 
 function FehlerstromerkennungField({ state, setState }) {
   const value = state.ladestation.fehlerstromerkennung;
-  const isPreset = value === '' || value === 'Typ A' || value === 'Typ B';
+  const isPreset = value === '' || value === 'A-RCD' || value === 'B-RCD';
   const selectValue = isPreset ? value : 'custom';
 
+  // Spiegelt die Auswahl immer 1:1 in ALLE Messung-Zeilen (RCD Typ) —
+  // keine "nur wenn leer"-Ausnahme, damit die Synchronisierung nie
+  // durch einen bereits gesetzten (auch veralteten) Wert blockiert wird.
   const applyValue = (newValue) => {
     setState((s) => {
       const shortCode = rcdShortCode(newValue);
-      const messung = s.messung.map((row) => (row.rcdTyp ? row : { ...row, rcdTyp: shortCode }));
+      const messung = s.messung.map((row) => ({ ...row, rcdTyp: shortCode }));
       return { ...s, ladestation: { ...s.ladestation, fehlerstromerkennung: newValue }, messung };
     });
   };
@@ -128,8 +131,8 @@ function FehlerstromerkennungField({ state, setState }) {
         onChange={(e) => applyValue(e.target.value === 'custom' ? '' : e.target.value)}
       >
         <option value="">– wählen –</option>
-        <option value="Typ A">Typ A</option>
-        <option value="Typ B">Typ B</option>
+        <option value="A-RCD">A-RCD</option>
+        <option value="B-RCD">B-RCD</option>
         <option value="custom">Andere…</option>
       </select>
       {selectValue === 'custom' && (
