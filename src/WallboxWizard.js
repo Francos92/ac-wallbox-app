@@ -24,6 +24,7 @@ const getPath = (obj, path) => path.split('.').reduce((o, k) => (o == null ? o :
 
 const emptyMessungRow = () => ({
   bmk: '', stromkreis: '', kabelTyp: '', ader: '', querschnitt: '',
+  isoVSchuetz: '>999', isoNSchuetz: '>999',
   art: '', inA: '', zs: '', zsIk: '', zi: '', ziIk: '',
   rcdTyp: '', rcdIn: '', iDeltaN: '', iA: '', tA: '', uB: '',
 });
@@ -354,6 +355,8 @@ function MessungRow({ row, index, update }) {
         <label className="field"><span>Kabel-Typ</span><input value={row.kabelTyp} onChange={(e) => set('kabelTyp', e.target.value)} /></label>
         <label className="field"><span>Aderzahl</span><input value={row.ader} onChange={(e) => set('ader', e.target.value)} /></label>
         <label className="field"><span>Querschnitt [mm²]</span><input value={row.querschnitt} onChange={(e) => set('querschnitt', e.target.value)} /></label>
+        <label className="field"><span>Isowiderstand v.Schütz [MΩ]</span><input value={row.isoVSchuetz} onChange={(e) => set('isoVSchuetz', e.target.value)} /></label>
+        <label className="field"><span>Isowiderstand n.Schütz [MΩ]</span><input value={row.isoNSchuetz} onChange={(e) => set('isoNSchuetz', e.target.value)} /></label>
         <label className="field"><span>Art (B/C/D)</span><input value={row.art} onChange={(e) => set('art', e.target.value)} /></label>
         <label className="field"><span>IN [A]</span><input value={row.inA} onChange={(e) => set('inA', e.target.value)} /></label>
         <label className="field"><span>Zs [Ω]</span><input value={row.zs} onChange={(e) => set('zs', e.target.value)} /></label>
